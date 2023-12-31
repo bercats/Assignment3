@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Advertisements</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <script type="text/javascript" src="/static/js.js"></script>
+</head>
+<body>
+<h1>Manage Advertisements</h1>
+<div class="menu">
+    <a href="/">Home Page </a> |
+    <a href="/advertisement"> My Advertisements </a> |
+    <a href="/profile"> My Profile </a> |
+    <a href="/logout"> Logout </a>
+    </div>
+<form name="advertisementcreate" action="/advertisement" method="POST" onsubmit="return validateAdForm();">
+    <p>Advertisement Title: <input type="text" name="title" value=""></p>
+    <p>Advertisement Description: <input type="text" name="description" value=""></p>
+    <p>Category:
+        <select name="category">
+            {% for category in categories %}
+            <option value="{{ category[0] }}">{{ category[1] }}</option>
+            {% endfor %}
+        </select>
+    </p>
+    <p><input type="submit" value="Create Advertisement"></p>
+    <p id="formerror" style="color: red;"></p>
+</form>
+
+{% if ads %}
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Activate/Deactivate</th>
+    </tr>
+    {% for advertisement in ads %}
+    <tr>
+        <td>{{ advertisement[1] }}</td>
+        <td>{{ advertisement[2] }}</td>
+        <td>{{ categories_dict[advertisement[5]] }}</td>
+        <td>
+            {% if advertisement[3] == 1 %}
+            <a href="/advertisement/{{ advertisement[0] }}/toggle">Deactivate</a>
+            {% else %}
+            <a href="/advertisement/{{ advertisement[0] }}/toggle">Activate</a>
+            {% endif %}
+        </td>
+    {% endfor %}
+</table>
+{% else %}
+    <p>No advertisements found.</p>
+{% endif %}
+</body>
+</html>

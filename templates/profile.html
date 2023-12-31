@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <link rel="stylesheet" type="text/css" href="static/style.css">
+</head>
+<body>
+<h1>{{ user[0] }}'s Profile</h1>
+<div class="menu">
+    <a href="/">Home Page </a> |
+    <a href="/advertisement"> My Advertisements </a> |
+    <a href="/profile"> My Profile </a> |
+    <a href="/logout"> Logout </a>
+</div>
+<h2>{{ user[0] }}'s Details</h2>
+<form name="editform" action="/profile" method="POST">
+    <p>Username: <input type="text" name="username" value="{{ user[0] }}"></p>
+    <p>Full Name: <input type="text" name="fullname" value="{{ user[2] }}"></p>
+    <p>Email: <input type="email" name="email" value="{{ user[3] }}"></p>
+    <p>Phone Number: <input type="tel" name="telephone" value="{{ user[4] }}"></p>
+    <p><input type="submit" value="Edit"></p>
+</form>
+{% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% endif %}
+</body>
+</html>

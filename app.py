@@ -5,12 +5,50 @@ app = Flask(__name__)
 app.secret_key= "123"
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=["GET", "POST"])
 def index():
-    if "username" in session:
-        return render_template("index.html", username=session["username"])
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM Category")
+    categories = c.fetchall()
+    category_dict = {category[0]: category[1] for category in categories}
+    if request.method == "GET":
+        if "username" in session:
+            return render_template("index.html", username=session["username"], categories=categories)
+        else:
+            return render_template("index.html", categories=categories)
     else:
-        return render_template("index.html")
+        keyword = request.form["keyword"]
+        cid = request.form["category"]
+        c = conn.cursor()
+        if cid == "all":
+            ads = {}
+            for category in categories:
+                c.execute("SELECT Advertisement.*, User.fullname FROM Advertisement INNER JOIN User ON Advertisement.username = User.username WHERE (Advertisement.title LIKE ? OR Advertisement.description LIKE ? OR User.fullname LIKE ?) AND cid = ? AND isactive = 1", ('%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%', category[0]))
+                rows = c.fetchall()
+                ads[category[1]] = rows
+        else:
+            c.execute("SELECT Advertisement.*, User.fullname FROM Advertisement INNER JOIN User ON Advertisement.username = User.username WHERE (Advertisement.title LIKE ? OR Advertisement.description LIKE ? OR User.fullname LIKE ?) AND cid = ? AND isactive = 1", ('%'+keyword+'%', '%'+keyword+'%', '%'+keyword+'%', cid))
+            rows = c.fetchall()
+            ads = {"all": rows}
+        conn.close()
+        if "username" in session:
+            return render_template("index.html", username=session["username"], ads=ads, categories=categories, categories_dict=category_dict)
+        else:
+            return render_template("index.html", ads=ads, categories=categories, categories_dict=category_dict)
+
+@app.route('/ad_details/<int:ad_id>', methods=["GET"])
+def ad_details(ad_id):
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
+    c.execute("SELECT Advertisement.*, User.fullname, User.email, User.telno FROM Advertisement INNER JOIN User ON Advertisement.username = User.username WHERE Advertisement.aid = ?", (ad_id,))
+    ad = c.fetchone()
+    conn.close()
+    if ad is None:
+        return "Advertisement not found", 404
+    else:
+        return render_template("ad_details.html", ad=ad)
+
 
 @app.route('/login', methods=["GET", "POST"])
 def login():

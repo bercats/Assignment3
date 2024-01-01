@@ -26,5 +26,45 @@
     {% endif %}
     <p>Don't have an account? <a href="/register">Register</a></p>
 {% endif %}
+
+<h2>Search for an advertisement</h2>
+<form name="searchform" action = "/index" method="POST" >
+        <input type="text" name="keyword" placeholder="Enter keyword">
+        <select name ="category">
+            <option value="all">All</option>
+            {% for category in categories %}
+            <option value="{{ category[0] }}">{{ category[1] }}</option>
+            {% endfor %}
+        </select>
+        <p><input type="submit" value="Search"></p>
+    </form>
+
+{% if ads %}
+    {% for category, advertisements in ads.items() %}
+        <h2>{{ category }}</h2>
+        {% if advertisements %}
+            <table>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Contact Full Name</th>
+                    <th>Ad Link</th>
+                </tr>
+                {% for advertisement in advertisements %}
+                    <tr>
+                        <td>{{ advertisement[1] }}</td>
+                        <td>{{ advertisement[2] }}</td>
+                        <td>{{ advertisement[6] }}</td>
+                        <td><a href="/ad_details/{{ advertisement[0] }}">See More</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No advertisement</p>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>No advertisement</p>
+{% endif %}
 </body>
 </html>
